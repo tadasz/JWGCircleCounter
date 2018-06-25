@@ -58,7 +58,7 @@
     return self;
 }
 
-- (void)startWithSeconds:(NSInteger)seconds {
+- (void)startWithSeconds:(NSTimeInterval)seconds {
 
     [JWGCircleCounter validateInputTime:seconds];
 
@@ -152,8 +152,8 @@
 
 #pragma mark - Private methods
 
-+ (void)validateInputTime:(NSInteger)time {
-    if (time < 1) {
++ (void)validateInputTime:(NSTimeInterval)time {
+    if (time < 0.01) {
         [NSException raise:@"JWGInvalidTime"
                     format:@"inputted timer length, %li, must be a positive integer", (long)time];
     }

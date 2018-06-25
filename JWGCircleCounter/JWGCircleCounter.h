@@ -62,7 +62,7 @@
  *
  * @param seconds the length of the countdown timer
  */
-- (void)startWithSeconds:(NSInteger)seconds;
+- (void)startWithSeconds:(NSTimeInterval)seconds;
 
 /**
  * Sets the new value for the timer. This only has an effect if the
@@ -95,14 +95,6 @@
 
 
 @protocol JWGCircleCounterDelegate <NSObject>
-
-/**
- * Alerts the delegate when the timer expires. At this point, counter animation is completed too.
- *
- * @param circleCounter the counter that just expired in time
- */
-@optional
-- (void)circleCounterTimeDidExpire:(JWGCircleCounter *)circleCounter;
 
 /**
  * Alerts the delegate when the timer expires. At this point, counter animation is completed too.
