@@ -6,7 +6,7 @@ Pod::Spec.new do |s|
   s.homepage = 'https://github.com/johngraham262/JWGCircleCounter'
   s.license = 'MIT'
   s.source = {
-    :git => 'https://github.com/johngraham262/JWGCircleCounter.git',
+    :git => 'https://github.com/tadasz/JWGCircleCounter.git',
     :tag => s.version.to_s
   }
   s.platform = :ios, '6.0'
