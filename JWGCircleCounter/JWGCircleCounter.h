@@ -33,7 +33,7 @@
 @property (nonatomic, assign) CGFloat circleTimerWidth;
 
 /// Indicates if the circle counter did start the countdown and animation.
-@property (nonatomic, assign, readonly) BOOL didStart;
+@property (nonatomic, assign) BOOL didStart;
 
 /// Indicates if the circle counter is currently counting down and animating.
 @property (nonatomic, assign, readonly) BOOL isRunning;
