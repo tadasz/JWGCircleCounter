@@ -55,6 +55,8 @@
 /// Hides timeLabel when time is expired - default is YES.
 @property (nonatomic, assign) BOOL hidesTimerLabelWhenFinished;
 
+/// Total time for timer
+@property (assign, nonatomic) NSTimeInterval totalTime;
 
 /**
  * Begins the count down and starts the animation. This has no effect if the counter
