@@ -77,6 +77,9 @@
     _isRunning = YES;
     _didStart = YES;
     _didFinish = NO;
+    
+    [self.fadeOutTimer invalidate];
+    self.isFadingOut = NO;
 
     self.lastStartTime = [NSDate dateWithTimeIntervalSinceNow:0];
     self.completedTimeUpToLastStop = 0;
@@ -91,6 +94,9 @@
     if (_isRunning) {
         return;
     }
+    
+    [self.fadeOutTimer invalidate];
+    self.isFadingOut = NO;
 
     _elapsedTime = value;
     self.completedTimeUpToLastStop = value;
@@ -131,6 +137,9 @@
 }
 
 - (void)stop {
+    [self.fadeOutTimer invalidate];
+    self.isFadingOut = NO;
+    
     _isRunning = NO;
 
     self.completedTimeUpToLastStop += [[NSDate date] timeIntervalSinceDate:self.lastStartTime];
@@ -140,6 +149,8 @@
 }
 
 - (void)reset {
+    [self.fadeOutTimer invalidate];
+    self.isFadingOut = NO;
     [self.timer invalidate];
     self.timer = nil;
 
@@ -280,8 +291,6 @@
     if (self.fadeOutElapsed > 0) {
         alpha = self.fadeOutElapsed / self.fadeOutDuration;
     }
-    NSLog(@"alpha %f", alpha);
-    
     CGContextSetStrokeColorWithColor(context, [[self.circleColor colorWithAlphaComponent:alpha] CGColor]);
     CGContextStrokePath(context);
 }
@@ -300,8 +309,7 @@
 }
 
 - (void)fadeOutTimerFired
-{    
-    NSLog(@"fadeOutTimerFired");
+{
     if (!self.isFadingOut) {
         return;
     }
