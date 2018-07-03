@@ -93,6 +93,11 @@
  */
 - (void)reset;
 
+/**
+ * Resets counter with fade effect
+ */
+- (void)fadeResetWithTime:(NSTimeInterval)seconds;
+
 @end
 
 

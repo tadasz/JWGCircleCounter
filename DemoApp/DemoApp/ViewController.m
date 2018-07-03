@@ -53,13 +53,15 @@
 
 - (void)circleCounterTimeDidExpire:(JWGCircleCounter *)circleCounter {
     [self.startButton setTitle:@"Restart" forState:UIControlStateNormal];
-
-    UIAlertView *alertView = [[UIAlertView alloc] initWithTitle:@"Timer Expired"
-                                                        message:nil
-                                                       delegate:nil
-                                              cancelButtonTitle:@"OK"
-                                              otherButtonTitles:nil];
-    [alertView show];
+     
+    [self.circleCounter fadeResetWithTime:2];
+    
+//    UIAlertView *alertView = [[UIAlertView alloc] initWithTitle:@"Timer Expired"
+//                                                        message:nil
+//                                                       delegate:nil
+//                                              cancelButtonTitle:@"OK"
+//                                              otherButtonTitles:nil];
+//    [alertView show];
 }
 
 @end

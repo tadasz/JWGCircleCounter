@@ -12,8 +12,14 @@
 
 @interface JWGCircleCounter()
 
+@property (strong, nonatomic) NSTimer *fadeOutTimer;
 @property (strong, nonatomic) NSTimer *timer;
 @property (strong, nonatomic) NSDate *lastStartTime;
+
+@property (strong, nonatomic) NSDate *fadeOutTimerStarted;
+@property (assign, nonatomic) NSTimeInterval fadeOutDuration;
+@property (assign, nonatomic) NSTimeInterval fadeOutElapsed;
+@property (assign, nonatomic) BOOL isFadingOut;
 
 @property (assign, nonatomic) NSTimeInterval completedTimeUpToLastStop;
 
@@ -34,6 +40,7 @@
     [self setupTimerLabel];
     self.timerLabelHidden = YES;
     self.hidesTimerLabelWhenFinished = YES;
+    self.isFadingOut = NO;
     
     self.completedTimeUpToLastStop = 0;
     _elapsedTime = 0;
@@ -190,10 +197,18 @@
 }
 
 - (void)drawRect:(CGRect)rect {
+    if (self.isFadingOut) {
+        [self drawFadeResetCircleRect:rect];
+    } else {
+        [self drawTimerCircleRect:rect];
+    }
+}
+
+- (void)drawTimerCircleRect:(CGRect)rect {
     CGContextRef context = UIGraphicsGetCurrentContext();
     CGFloat radius = CGRectGetWidth(rect)/2.0f - self.circleTimerWidth/2.0f;
     CGFloat angleOffset = M_PI_2;
-
+    
     // Draw the background of the circle.
     CGContextSetLineWidth(context, self.circleTimerWidth);
     CGContextBeginPath(context);
@@ -206,17 +221,17 @@
     CGContextSetStrokeColorWithColor(context, [self.circleBackgroundColor CGColor]);
     CGContextSetFillColorWithColor(context, [self.circleFillColor CGColor]);
     CGContextDrawPath(context, kCGPathFillStroke);
-
+    
     // Draw the remaining amount of timer circle.
     CGContextSetLineWidth(context, self.circleTimerWidth);
     CGContextBeginPath(context);
     CGFloat startAngle = (((CGFloat)self.elapsedTime) / (CGFloat)self.totalTime)*M_PI*2;
-
+    
     if (!self.isRunning && !self.didStart && !self.didFinish) {
         // If the timer hasn't started yet, fill the whole circle. (startAngle will be NaN)
         startAngle = 0;
     }
-
+    
     CGContextAddArc(context,
                     CGRectGetMidX(rect), CGRectGetMidY(rect),
                     radius,
@@ -225,6 +240,82 @@
                     0);
     CGContextSetStrokeColorWithColor(context, [self.circleColor CGColor]);
     CGContextStrokePath(context);
+}
+
+- (void)drawFadeResetCircleRect:(CGRect)rect {
+    CGContextRef context = UIGraphicsGetCurrentContext();
+    CGFloat radius = CGRectGetWidth(rect)/2.0f - self.circleTimerWidth/2.0f;
+    CGFloat angleOffset = M_PI_2;
+    
+    // Draw the background of the circle.
+    CGContextSetLineWidth(context, self.circleTimerWidth);
+    CGContextBeginPath(context);
+    CGContextAddArc(context,
+                    CGRectGetMidX(rect), CGRectGetMidY(rect),
+                    radius,
+                    0,
+                    2*M_PI,
+                    0);
+    CGContextSetStrokeColorWithColor(context, [self.circleBackgroundColor CGColor]);
+    
+
+    CGContextSetFillColorWithColor(context, [self.circleFillColor CGColor]);
+    CGContextDrawPath(context, kCGPathFillStroke);
+    
+    // Draw the remaining amount of timer circle.
+    CGContextSetLineWidth(context, self.circleTimerWidth);
+    CGContextBeginPath(context);
+    CGFloat startAngle = 0;
+    
+
+    
+    CGContextAddArc(context,
+                    CGRectGetMidX(rect), CGRectGetMidY(rect),
+                    radius,
+                    startAngle - angleOffset,
+                    2*M_PI - angleOffset,
+                    0);
+    
+    CGFloat alpha = 0;
+    if (self.fadeOutElapsed > 0) {
+        alpha = self.fadeOutElapsed / self.fadeOutDuration;
+    }
+    NSLog(@"alpha %f", alpha);
+    
+    CGContextSetStrokeColorWithColor(context, [[self.circleColor colorWithAlphaComponent:alpha] CGColor]);
+    CGContextStrokePath(context);
+}
+
+- (void)fadeResetWithTime:(NSTimeInterval)seconds
+{
+    self.fadeOutTimerStarted = [NSDate date];
+    self.fadeOutDuration = seconds;
+    self.fadeOutElapsed = 0;
+    self.isFadingOut = YES;
+    self.fadeOutTimer = [NSTimer scheduledTimerWithTimeInterval:JWG_TIMER_INTERVAL
+                                                  target:self
+                                                selector:@selector(fadeOutTimerFired)
+                                                userInfo:nil
+                                                 repeats:YES];
+}
+
+- (void)fadeOutTimerFired
+{    
+    NSLog(@"fadeOutTimerFired");
+    if (!self.isFadingOut) {
+        return;
+    }
+    
+    self.fadeOutElapsed = -[self.fadeOutTimerStarted timeIntervalSinceNow];
+    
+    if (self.fadeOutElapsed > self.fadeOutDuration) {
+        [self.fadeOutTimer invalidate];
+        self.isFadingOut = NO;
+        return;
+    }
+    
+    [self setNeedsDisplay];
+    
 }
 
 @end
